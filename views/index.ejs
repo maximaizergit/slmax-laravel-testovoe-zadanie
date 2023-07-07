@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0; /* Убираем внешние отступы по умолчанию */
+        padding: 0; /* Убираем внутренние отступы по умолчанию */
+
+        display: grid;
+        grid-template-columns: 1fr 2fr; /* Левая и правая колонки */
+        grid-template-rows: 75px 175px 1fr 75px;
+        height: 100vh; /* Задаем высоту 100% от видимой области окна */
+      }
+
+      .header-left {
+        grid-column: 1; /* Занимает обе колонки */
+        grid-row: 1 / span 2;
+        background-color: #2ce4d1;
+        padding: 20px;
+        text-align: center;
+      }
+      .header-right {
+        grid-column: 2 / span 2; /* Занимает обе колонки */
+        grid-row: 1;
+        background-color: #ed249c;
+        padding: 20px;
+        text-align: center;
+      }
+
+      aside {
+        grid-row: 3 / span 4; /* Занимает две средние строки */
+        background-color: #1fc40d;
+        padding: 20px;
+      }
+
+      main {
+        grid-column: 2;
+        grid-row: 2 / span 3;
+        background-color: #3f28d2;
+        padding: 20px;
+      }
+
+      footer {
+        grid-column: 2 / span 2; /* Занимает обе колонки */
+        grid-row: 4;
+        background-color: #9a3838;
+        padding: 20px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header-left">
+      <h1>Рабочий чат <%= message %></h1>
+      <!-- Добавьте элементы для поиска по чатам -->
+    </div>
+    <div class="header-right"></div>
+    <aside>
+      <!-- Добавьте список чатов -->
+    </aside>
+    <main>
+      <!-- Добавьте информацию о пользователе и окно чата -->
+    </main>
+    <footer>
+      <!-- Добавьте поле ввода сообщения и кнопку отправки -->
+    </footer>
+  </body>
+</html>

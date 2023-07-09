@@ -3,66 +3,632 @@
   <head>
     <style>
       body {
-        margin: 0; /* Убираем внешние отступы по умолчанию */
-        padding: 0; /* Убираем внутренние отступы по умолчанию */
+        margin: 0;
+        padding: 0;
 
         display: grid;
-        grid-template-columns: 1fr 2fr; /* Левая и правая колонки */
-        grid-template-rows: 75px 175px 1fr 75px;
-        height: 100vh; /* Задаем высоту 100% от видимой области окна */
+        grid-template-columns: 0.7fr 2fr;
+        grid-template-rows: 75px 175px 1fr 50px;
+        height: 100vh;
       }
 
       .header-left {
-        grid-column: 1; /* Занимает обе колонки */
+        grid-column: 1;
         grid-row: 1 / span 2;
-        background-color: #2ce4d1;
+        background-color: #e3dfdf;
+        border-right: 1px solid #a6a2a2;
         padding: 20px;
         text-align: center;
       }
       .header-right {
-        grid-column: 2 / span 2; /* Занимает обе колонки */
+        grid-column: 2 / span 2;
         grid-row: 1;
-        background-color: #ed249c;
+        background-color: #e3dfdf;
         padding: 20px;
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      .header-right span {
+        font-size: 32px;
+      }
+      .header-right img {
+        max-width: 50px;
+        max-height: 50px;
+        border-radius: 40px;
+        margin-left: 30px;
+        margin-right: 30px;
       }
 
       aside {
-        grid-row: 3 / span 4; /* Занимает две средние строки */
-        background-color: #1fc40d;
-        padding: 20px;
+        grid-row: 3 / span 4;
+        background-color: #e3dfdf;
+        border: 1px solid #a6a2a2;
+        padding: 0;
       }
 
-      main {
+      .main {
         grid-column: 2;
-        grid-row: 2 / span 3;
-        background-color: #3f28d2;
+        grid-row: 2 / span 2;
+        background-color: #dadada;
         padding: 20px;
+        overflow-y: scroll;
+      }
+      .message {
+        padding: 8px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        border: 1px solid black;
+        max-width: 50%;
+        clear: both;
+        word-wrap: break-word;
+      }
+      .message img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+      .message.sender {
+        background-color: #e8e8e8;
+        float: right;
+        clear: both;
       }
 
+      .message.receiver {
+        background-color: #e8e8e8;
+        float: left;
+        clear: both;
+      }
+      ul {
+        list-style-type: none;
+      }
       footer {
-        grid-column: 2 / span 2; /* Занимает обе колонки */
+        grid-column: 2 / span 2;
         grid-row: 4;
-        background-color: #9a3838;
+        background-color: #e3dfdf;
         padding: 20px;
-        text-align: center;
+        display: flex;
+        align-items: center;
+      }
+
+      #message-input {
+        flex-grow: 1;
+        border-radius: 20px;
+        padding: 8px;
+      }
+
+      #send-button {
+        background-color: #5cb85c;
+        border: none;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        margin-left: 8px;
+      }
+      .chat {
+        display: grid;
+        grid-template-rows: 25px 25px;
+        grid-template-columns: 50px auto 1fr;
+        align-items: center;
+        padding: 10px;
+        max-height: 50px;
+        background-color: #e3dfdf;
+        border-bottom: 1px solid #ccc;
+      }
+
+      .user-name {
+        font-size: 16px;
+        grid-column: 2 / span 3;
+        font-weight: bold;
+        grid-row: 1;
+        margin-left: 10px;
+      }
+
+      .last-message {
+        grid-column: 2 / span 3;
+        grid-row: 2;
+        font-size: 14px;
+        color: #000000;
+        margin-left: 10px;
+      }
+      .user-avatar {
+        grid-column: 1;
+        grid-row: 1 / span 2;
+      }
+      .user-avatar.online img {
+        border: 2px solid green;
+      }
+      .user-avatar.group img {
+        border: 2px solid rgb(0, 0, 0);
+      }
+      .user-avatar img {
+        max-width: 50px;
+        max-height: 50px;
+        border: 2px solid red;
+        border-radius: 40px;
+      }
+
+      .unread-count {
+        grid-column: 2;
+        display: inline-block;
+        margin-left: 10px;
+        padding: 4px 8px;
+        max-width: 5px;
+        max-height: 10px;
+        background-color: #ff0000;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 12px;
+      }
+      .group-name {
+        font-weight: bold;
+        font-size: 20px;
+        color: #4116dc;
       }
     </style>
   </head>
   <body>
     <div class="header-left">
-      <h1>Рабочий чат <%= message %></h1>
-      <!-- Добавьте элементы для поиска по чатам -->
+      <h1>Рабочий чат</h1>
+      <form id="createGroupChatForm">
+        <input type="text" id="chatNameInput" placeholder="Название чата" />
+        <button type="submit">Создать чат</button>
+      </form>
     </div>
     <div class="header-right"></div>
-    <aside>
-      <!-- Добавьте список чатов -->
-    </aside>
-    <main>
-      <!-- Добавьте информацию о пользователе и окно чата -->
-    </main>
+    <aside id="user-list"></aside>
+    <div class="main">
+      <ul id="message-list">
+        <!-- Здесь будут отображаться сообщения -->
+      </ul>
+    </div>
     <footer>
-      <!-- Добавьте поле ввода сообщения и кнопку отправки -->
+      <input type="text" id="message-input" placeholder="Введите сообщение" />
+      <button id="send-button">Отправить</button>
+      <input id="file-input" type="file" />
     </footer>
   </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    let userId = '<%= data.userId %>';
+    let username = '<%= data.username %>';
+    let selectedUserId = null;
+    let inGroupChat = null;
+    let recepientId = null;
+    socket.on('connect', () => {
+      console.log('Connected to server');
+      socket.emit('getChats', { userId });
+
+      // Запрашиваем список пользователей при подключении к серверу
+      socket.on('userList', (users) => {
+        const userList = document.getElementById('user-list');
+        // Очистить список пользователей перед добавлением новых элементов
+        userList.innerHTML = '';
+        users.forEach((user) => {
+          // Создать элемент чата
+          if (userId != user.id) {
+            const chatElement = document.createElement('div');
+            chatElement.classList.add('chat');
+            if (user.isGroup) {
+              chatElement.classList.add('group');
+            }
+            chatElement.setAttribute('data-chat-id', user.id);
+
+            const userInfo = document.createElement('div');
+            userInfo.classList.add('user-info');
+
+            const userAvatar = document.createElement('div');
+            userAvatar.classList.add('user-avatar');
+            const avatarImg = document.createElement('img');
+
+            if (user.avatar) {
+              avatarImg.src = '/avatar-uploads/' + user.avatar + '.jpg';
+            } else {
+              avatarImg.src = '/avatar-uploads/default-avatar.jpg';
+            }
+            avatarImg.alt = 'User Avatar';
+            if (user.online) {
+              userAvatar.classList.add('online');
+            }
+            if (user.isGroup) {
+              userAvatar.classList.add('group');
+            }
+
+            userAvatar.appendChild(avatarImg);
+
+            const userName = document.createElement('h3');
+            userName.classList.add('user-name');
+            userName.textContent = user.name;
+
+            const lastMessage = document.createElement('p');
+            lastMessage.classList.add('last-message');
+            if (user.lastMessage) {
+              if (user.lastMessage.text.length > 30) {
+                lastMessage.textContent =
+                  user.lastMessage.text.substring(0, 30) + '...';
+              } else {
+                lastMessage.textContent = user.lastMessage.text;
+              }
+            }
+
+            // Если есть непрочитанные сообщения, создать элемент счетчика непрочитанных сообщений
+            //if (user.unreadCount > 0) {
+            //  const unreadCount = document.createElement('span');
+            //  unreadCount.classList.add('unread-count');
+            //  unreadCount.textContent = user.unreadCount;
+            //  chatElement.appendChild(unreadCount);
+            //  }
+
+            userInfo.appendChild(userName);
+            chatElement.appendChild(userInfo);
+            chatElement.appendChild(lastMessage);
+            chatElement.appendChild(userAvatar);
+
+            userList.appendChild(chatElement);
+          }
+        });
+        document.querySelectorAll('.chat').forEach((chat) => {
+          chat.addEventListener('click', (event) => {
+            selectedUserId = event.currentTarget.getAttribute('data-chat-id');
+            const isGroup = event.currentTarget.classList.contains('group');
+
+            socket.emit('selectChat', {
+              userId: userId,
+              selectedUserId: selectedUserId,
+              isGroup: isGroup,
+            });
+
+            recepientId = selectedUserId;
+          });
+        });
+      });
+
+      socket.on('messageReceived', (message) => {
+        if (!inGroupChat) {
+          displayMsg(message.message);
+        } else {
+          displayGroupMsg(message.message);
+        }
+      });
+
+      socket.on('searchMessagesResult', (data) => {
+        const messageList = document.getElementById('message-list');
+        messageList.innerHTML = '';
+        data.messages.forEach((message) => {
+          if (!inGroupChat) {
+            displayMsg(message);
+          } else {
+            displayGroupMsg(message);
+          }
+        });
+      });
+
+      socket.on('chatSelected', (data) => {
+        const { chatId, messages, otherUser, isGroup } = data;
+        console.log('new active chat', data);
+        activeChat = chatId;
+
+        const messageList = document.getElementById('message-list');
+        messageList.innerHTML = '';
+        messages.forEach((message) => {
+          if (!isGroup) {
+            inGroupChat = false;
+            displayMsg(message);
+          } else {
+            inGroupChat = true;
+            displayGroupMsg(message);
+          }
+        });
+
+        // Отображаем имя пользователя и аватарку
+        const headerRight = document.querySelector('.header-right');
+
+        headerRight.innerHTML = `
+            <img class="user-avatar" src="/avatar-uploads/${otherUser.avatar}.jpg" alt="User Avatar">
+            <span class="user-name">${otherUser.name}</span>
+            <div class="message-search">
+        <input type="text" id="message-search-input" placeholder="Поиск по сообщениям">
+        <button id="message-search-button">Найти</button>
+      </div>
+          `;
+
+        const messageSearchInput = document.getElementById(
+          'message-search-input',
+        );
+        const messageSearchButton = document.getElementById(
+          'message-search-button',
+        );
+
+        messageSearchButton.addEventListener('click', () => {
+          const searchText = messageSearchInput.value;
+          socket.emit('searchMessages', { searchText, activeChat });
+        });
+        messageSearchInput.addEventListener('input', (event) => {
+          const searchText = event.target.value.trim();
+
+          if (searchText === '') {
+            socket.emit('selectChat', {
+              userId,
+              selectedUserId,
+              isGroup: inGroupChat,
+            });
+          }
+        });
+
+        listItem.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      });
+
+      socket.on('newMessageNotification', (data, senderId) => {
+        const chatId = senderId;
+        const messageText = data.message.text;
+
+        // Найти блок чата с указанным chatId
+        const chatBlock = document.querySelector(`[data-chat-id="${chatId}"]`);
+
+        // Обновить текст последнего сообщения
+        if (chatBlock) {
+          const lastMessageElement = chatBlock.querySelector('.last-message');
+          if (lastMessageElement) {
+            lastMessageElement.textContent = messageText;
+          }
+        }
+        const chatContainer = chatBlock.parentElement;
+        chatContainer.prepend(chatBlock);
+      });
+
+      // Функция для обновления статуса пользователя в чате
+      function updateStatusInChat(userId, status) {
+        const chatElement = document.querySelector(
+          `[data-chat-id="${userId}"]`,
+        );
+        if (chatElement) {
+          // Обновляем статус пользователя в соответствующем чате
+          chatElement.dataset.userStatus = status;
+        }
+      }
+
+      // Периодически отправляем запрос на обновление статуса пользователя
+      setInterval(() => {
+        socket.emit('getAllUsersStatus');
+      }, 5000);
+
+      socket.on('allUsersStatusUpdate', (data) => {
+        const usersStatus = data;
+
+        // Обновляем статусы пользователей в списке чатов
+        usersStatus.forEach((userStatus) => {
+          const { userId, status } = userStatus;
+
+          const chatElement = document.querySelector(
+            `[data-chat-id="${userId}"]`,
+          );
+          if (chatElement) {
+            const userAvatarElement = chatElement.querySelector('.user-avatar');
+            if (userAvatarElement) {
+              userAvatarElement.classList.toggle('online', status); // Добавляем/удаляем класс "online" в зависимости от статуса
+            }
+          }
+        });
+      });
+    });
+    function displayMsg(message) {
+      const listItem = document.createElement('li');
+      const messageContent = document.createElement('div');
+      const messageTime = document.createElement('div');
+
+      messageContent.textContent = message.text;
+
+      if (message.file) {
+        if (isImageFile(message.file)) {
+          const image = document.createElement('img');
+          image.src = message.file;
+          image.classList.add('message-image');
+          listItem.appendChild(image);
+        } else {
+          const downloadLink = document.createElement('a');
+          downloadLink.textContent = 'Скачать файл';
+          downloadLink.href = `/downloads/${encodeURIComponent(message.file)}`;
+          downloadLink.download = message.file;
+          listItem.appendChild(downloadLink);
+        }
+      }
+
+      const createdAt = new Date(message.createdAt);
+      const hours = createdAt.getHours();
+      const minutes = createdAt.getMinutes().toString().padStart(2, '0');
+      const formattedTime = `${hours}:${minutes}`;
+      messageTime.textContent = formattedTime;
+
+      listItem.appendChild(messageContent);
+      listItem.appendChild(messageTime);
+
+      // Добавление класса CSS в зависимости от отправителя
+      if (message.sender === username) {
+        listItem.classList.add('message', 'sender');
+      } else {
+        listItem.classList.add('message', 'receiver');
+      }
+
+      messageList.appendChild(listItem);
+      setTimeout(() => {
+        listItem.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 500);
+    }
+    function displayGroupMsg(message) {
+      const listItem = document.createElement('li');
+      const messageContent = document.createElement('div');
+      const messageTime = document.createElement('div');
+
+      const messageSender = document.createElement('div');
+      messageSender.classList.add('group-name');
+      messageSender.textContent = message.sender;
+      listItem.appendChild(messageSender);
+
+      messageContent.textContent = message.text;
+
+      if (message.file) {
+        if (isImageFile(message.file)) {
+          const image = document.createElement('img');
+          image.src = message.file;
+          image.classList.add('message-image');
+          listItem.appendChild(image);
+        } else {
+          const downloadLink = document.createElement('a');
+          downloadLink.textContent = 'Скачать файл';
+          downloadLink.href = `/downloads/${encodeURIComponent(message.file)}`;
+          downloadLink.download = message.file;
+          listItem.appendChild(downloadLink);
+        }
+      }
+
+      const createdAt = new Date(message.createdAt);
+      const hours = createdAt.getHours();
+      const minutes = createdAt.getMinutes().toString().padStart(2, '0');
+      const formattedTime = `${hours}:${minutes}`;
+      messageTime.textContent = formattedTime;
+
+      listItem.appendChild(messageContent);
+      listItem.appendChild(messageTime);
+
+      // Добавление класса CSS в зависимости от отправителя
+      if (message.sender === username) {
+        listItem.classList.add('message', 'sender');
+      } else {
+        listItem.classList.add('message', 'receiver');
+      }
+
+      messageList.appendChild(listItem);
+      setTimeout(() => {
+        listItem.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 500);
+    }
+
+    function isImageFile(file) {
+      const imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+      const extension = file.split('.').pop().toLowerCase();
+      return imageExtensions.includes(extension);
+    }
+
+    let activeChat = null;
+
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const messageList = document.getElementById('message-list');
+
+    sendButton.addEventListener('click', () => {
+      const message = messageInput.value;
+
+      sendMessage(message);
+    });
+
+    function sendMessage(messageText) {
+      if (!activeChat) {
+        console.log('No active chat selected');
+        return;
+      }
+
+      const fileInput = document.getElementById('file-input');
+      const file = fileInput.files[0];
+      const createdAt = new Date();
+
+      if (file) {
+        const message = {
+          chatId: activeChat,
+          text: messageText,
+          sender: username,
+          createdAt: createdAt,
+          file: file,
+          originalName: file.name,
+        };
+
+        if (!inGroupChat) {
+          socket.emit('sendMessage', {
+            message,
+            recepientId,
+            userId,
+            file: file,
+            originalName: file.name,
+            isGroup: false,
+          });
+        } else {
+          socket.emit('sendMessage', {
+            message,
+            recepientId,
+            userId,
+            file: file,
+            originalName: file.name,
+            isGroup: true,
+          });
+        }
+      } else {
+        const message = {
+          chatId: activeChat,
+          text: messageText,
+          sender: username,
+          createdAt: createdAt,
+        };
+        if (!inGroupChat) {
+          socket.emit('sendMessage', {
+            message,
+            recepientId,
+            userId,
+            file: null,
+            originalName: null,
+            isGroup: false,
+          });
+        } else {
+          socket.emit('sendMessage', {
+            message,
+            recepientId,
+            userId,
+            file: null,
+            originalName: null,
+            isGroup: true,
+          });
+        }
+      }
+
+      socket.emit('getChats', { userId });
+
+      const messageInput = document.getElementById('message-input');
+      messageInput.value = '';
+      fileInput.value = '';
+    }
+    const createGroupChatForm = document.getElementById('createGroupChatForm');
+
+    createGroupChatForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const chatNameInput = document.getElementById('chatNameInput');
+      const chatName = chatNameInput.value;
+
+      const formData = {
+        name: chatName,
+      };
+
+      fetch('/creategroupchat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      chatNameInput.value = '';
+    });
+    function scroll() {
+      const messageList = document.getElementById('message-list');
+      setTimeout(() => {
+        listItem.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 1000);
+    }
+  </script>
 </html>

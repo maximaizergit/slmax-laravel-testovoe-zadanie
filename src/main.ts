@@ -1,4 +1,3 @@
-// main.ts
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as path from 'path';
@@ -12,25 +11,31 @@ async function bootstrap() {
 
   app.setBaseViewsDir(path.join(__dirname, '..', '..', 'views'));
 
-  app.useStaticAssets(path.join(__dirname, '..', 'public'));
-
+  app.useStaticAssets(path.join(__dirname, '..', '..', 'avatar-uploads'), {
+    index: false,
+    prefix: '/avatar-uploads',
+  });
+  app.useStaticAssets(path.join(__dirname, '..', '..', 'uploads'), {
+    index: false,
+    prefix: '/uploads',
+  });
   app.setViewEngine('ejs');
 
   const expressApp = app.getHttpAdapter().getInstance();
   const MongoDBStore = connectMongoDBSession(session);
   const store = new MongoDBStore({
-    uri: 'mongodb+srv://maxim17shiglov08:arZkaOpzMALgplOq@test-zadanie.wbxgfos.mongodb.net/?retryWrites=true&w=majority',
+    uri: process.env.DB_CONNECTION_STRING,
     collection: 'sessions',
   });
   expressApp.use(
     session({
-      secret:
-        'd0d96651c9fffb09106a3b648cdcb84b4e03707c17927fc76004536daac06d7a',
+      secret: process.env.SECRET_KEY,
       resave: false,
       saveUninitialized: false,
       store: store,
     }),
   );
+
   await app.listen(3000);
 }
 bootstrap();

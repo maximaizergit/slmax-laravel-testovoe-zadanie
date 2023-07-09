@@ -36,4 +36,8 @@ export class UserService {
   ): Promise<User> {
     return this.userModel.findOne({ email, password }).exec();
   }
+
+  async getUsers(): Promise<User[]> {
+    return this.userModel.find().exec();
+  }
 }

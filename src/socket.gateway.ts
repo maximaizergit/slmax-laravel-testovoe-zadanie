@@ -52,10 +52,13 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         // Получить последние сообщения для каждого чата пользователя
         const chatPromises = filteredUsers.map(async (user) => {
           const chat = await this.chatService.getChat(userId, user.id);
+          let lastMessage;
+          if (chat) {
+            lastMessage = await this.messageService.getLastMessageByChatId(
+              chat['_id'],
+            );
+          }
 
-          const lastMessage = await this.messageService.getLastMessageByChatId(
-            chat['_id'],
-          );
           const recipientSocket = await this.findSocketByUserId(user.id);
           if (recipientSocket) {
             user.online = true; // Пользователь находится в сети
